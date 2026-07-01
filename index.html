@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#eff6ff">
+  <meta name="robots" content="index,follow">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <title>Free2AI - 免费试用友好的 AI API 中转与 AIGC 工具入口</title>
+  <meta name="description" content="Free2AI 聚合 AI API 中转、GPT API、Claude API、OpenAI relay、api proxy 与 AIGC 工具入口，适合免费试用、低成本开发和模型调用测试。">
+  <meta name="keywords" content="ai-api,gpt-api,openai-api,chatgpt-relay,openai-relay,claude-api,gemini-api,ai-gateway,api-proxy,ai-router,free-ai,aigc-tools,midjourney,stable-diffusion">
+  <meta property="og:title" content="Free2AI - AI API Relay Gateway">
+  <meta property="og:description" content="低成本、可试用的 AI API 中转与 AIGC 工具入口，覆盖 GPT、Claude、Gemini、OpenAI relay 和 api proxy 场景。">
+  <meta property="og:type" content="website">
+  <style>
+    :root {
+      --bg: #eef5ff;
+      --panel: rgba(255, 255, 255, 0.9);
+      --panel-strong: #ffffff;
+      --text: #17304e;
+      --muted: #5b6f87;
+      --line: rgba(57, 93, 138, 0.14);
+      --blue: #2f80ed;
+      --cyan: #06b6d4;
+      --green: #16a34a;
+      --shadow: 0 18px 48px rgba(44, 88, 143, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, "Microsoft YaHei", "PingFang SC", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(47, 128, 237, 0.15), transparent 24rem),
+        radial-gradient(circle at top right, rgba(6, 182, 212, 0.12), transparent 22rem),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    .page { width: min(1180px, calc(100% - 28px)); margin: 0 auto; padding: 24px 0 34px; }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(12px);
+    }
+
+    .nav-main {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      min-width: 0;
+      flex: 1;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .logo {
+      width: 50px;
+      height: 50px;
+      border-radius: 16px;
+      background: linear-gradient(145deg, #ffffff, #dff1ff);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+    }
+
+    .brand-text { min-width: 0; }
+    .brand-text h1 { margin: 0; font-size: 18px; line-height: 1.2; }
+    .brand-text p { margin: 4px 0 0; color: var(--muted); font-size: 12px; }
+
+    .nav-copy {
+      min-width: 0;
+      padding-left: 18px;
+      border-left: 1px solid var(--line);
+    }
+
+    .nav-copy h2 {
+      margin: 0 0 4px;
+      font-size: clamp(20px, 2.8vw, 34px);
+      line-height: 1.1;
+      letter-spacing: -0.5px;
+    }
+
+    .nav-copy p {
+      margin: 0;
+      max-width: 620px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .lang-select {
+      appearance: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: linear-gradient(180deg, #fff, #f4f8ff);
+      color: var(--text);
+      padding: 12px 42px 12px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
+    }
+
+    .lang-wrap { position: relative; }
+    .lang-wrap::after {
+      content: "▾";
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+      color: var(--blue);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .lang-content { display: none; }
+    .lang-content.active { display: block; }
+
+    .section {
+      margin-top: 16px;
+      padding: 16px 0 0;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .section-title h3 {
+      margin: 0;
+      font-size: 20px;
+    }
+
+    .section-title p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--panel-strong);
+      box-shadow: 0 10px 30px rgba(48, 82, 122, 0.08);
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      min-height: 158px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: rgba(47, 128, 237, 0.28);
+      box-shadow: 0 18px 38px rgba(48, 82, 122, 0.12);
+    }
+
+    .card.recommended {
+      background: linear-gradient(180deg, #ffffff, #eef7ff);
+      border-color: rgba(47, 128, 237, 0.18);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      width: fit-content;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      background: rgba(22, 163, 74, 0.1);
+      color: var(--green);
+    }
+
+    .tag.offline {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+    }
+
+    .tag.closed {
+      background: rgba(249, 115, 22, 0.1);
+      color: #f97316;
+    }
+
+    .name {
+      margin: 0 0 8px;
+      font-size: 18px;
+      line-height: 1.35;
+    }
+
+    .desc {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+      flex: 1;
+    }
+
+    .meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-top: auto;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(47, 128, 237, 0.08);
+      color: #0f4c8a;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .status::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .status.offline { color: #ef4444; }
+    .status.closed { color: #f97316; }
+
+    .visit {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .footer { margin-top: 18px; text-align: center; color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 720px) {
+      .page { width: min(100% - 18px, 1180px); padding: 18px 0 24px; }
+      .nav { padding: 12px 14px; }
+      .nav, .brand { align-items: flex-start; }
+      .nav, .nav-main { flex-direction: column; }
+      .nav-main { align-items: flex-start; gap: 12px; }
+      .nav-copy { padding-left: 0; border-left: 0; }
+      .lang-wrap { width: 100%; }
+      .lang-select { width: 100%; }
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="nav">
+      <div class="nav-main">
+        <div class="brand">
+          <div class="logo" aria-hidden="true">
+            <svg viewBox="0 0 64 64" width="32" height="32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="AI icon">
+              <rect x="16" y="18" width="32" height="28" rx="10" stroke="#2f80ed" stroke-width="3"/>
+              <circle cx="24" cy="30" r="3" fill="#06b6d4"/>
+              <circle cx="40" cy="30" r="3" fill="#06b6d4"/>
+              <path d="M25 40c2.6 2.2 5.5 3.3 7 3.3S36.4 42.2 39 40" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/>
+              <path d="M32 9v7M18 12l4 6M46 12l-4 6" stroke="#2f80ed" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1>Free2AI</h1>
+            <p class="lang-content active" data-lang-content="zh">AI API 中转入口</p>
+            <p class="lang-content" data-lang-content="en">AI API Relay Gateway</p>
+          </div>
+        </div>
+
+        <div class="nav-copy">
+          <div class="lang-content active" data-lang-content="zh">
+            <h2>AI API 中转与 AIGC 工具入口</h2>
+            <p>聚合 GPT API、Claude API、OpenAI relay、api proxy 与 AIGC 入口，适合免费试用和低成本开发测试。</p>
+          </div>
+          <div class="lang-content" data-lang-content="en">
+            <h2>AI API Relay and AIGC Tool Entry</h2>
+            <p>GPT API, Claude API, OpenAI relay, api proxy, and AIGC entries for trial-friendly, lower-cost testing.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="lang-wrap">
+        <select id="languageSelect" class="lang-select" aria-label="Language selector">
+          <option value="zh">中文</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="section" id="recommended">
+      <div class="section-title">
+        <div class="lang-content active" data-lang-content="zh"><h3>推荐入口</h3><p>优先展示仍在服务中的平台。</p></div>
+        <div class="lang-content" data-lang-content="en"><h3>Recommended Entry</h3><p>Prioritized live services.</p></div>
+      </div>
+      <div class="grid">
+        <a class="card recommended" href="https://pay.kklt.lol/" target="_blank" rel="noopener noreferrer">
+          <div class="tag">服务中 / Live</div>
+          <h4 class="name">KKLT AI 中转平台 / KKLT AI Relay Platform</h4>
+          <p class="desc lang-content active" data-lang-content="zh">信誉良好，已稳定服务 11 个月。提供便捷的 AI 中转相关服务入口。</p>
+          <p class="desc lang-content" data-lang-content="en">Trusted and stable for 11 months. A convenient entry for AI relay related services.</p>
+          <div class="meta"><span class="status">服务中</span><span class="visit">https://pay.kklt.lol/</span></div>
+        </a>
+        <a class="card recommended" href="https://api.443.hk/" target="_blank" rel="noopener noreferrer">
+          <div class="tag">服务中 / Live</div>
+          <h4 class="name">443 AI 中转服务 / 443 AI Relay Service</h4>
+          <p class="desc lang-content active" data-lang-content="zh">信誉良好，已稳定服务 8 个月。适合需要稳定访问 AI 接口的用户。</p>
+          <p class="desc lang-content" data-lang-content="en">Trusted and stable for 8 months. Built for users who need reliable AI access.</p>
+          <div class="meta"><span class="status">服务中</span><span class="visit">https://api.443.hk/</span></div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-title">
+        <div class="lang-content active" data-lang-content="zh"><h3>历史观察名单</h3><p>已跑路或已下线的历史记录。</p></div>
+        <div class="lang-content" data-lang-content="en"><h3>Historical List</h3><p>Offline and closed entries.</p></div>
+      </div>
+      <div class="grid">
+        <a class="card" href="https://ai-relay-cloud-404.invalid/" target="_blank" rel="noopener noreferrer">
+          <div class="tag offline">已跑路 / Offline</div>
+          <h4 class="name">云桥AI中转站 / Cloud AI Relay</h4>
+          <p class="desc lang-content active" data-lang-content="zh">服务 12 天，曾宣传低价高速转发，后续长期无法打开。</p>
+          <p class="desc lang-content" data-lang-content="en">Online for 12 days, then stopped responding and became unreachable.</p>
+          <div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div>
+        </a>
+        <a class="card" href="https://gpt-transfer-zone-offline.invalid/" target="_blank" rel="noopener noreferrer">
+          <div class="tag closed">已下线 / Closed</div>
+          <h4 class="name">GPT转接港 / GPT Transfer Port</h4>
+          <p class="desc lang-content active" data-lang-content="zh">服务 37 天，页面停止响应，客服入口同步失效。</p>
+          <p class="desc lang-content" data-lang-content="en">Ran for 37 days, then the page stopped responding and support went offline.</p>
+          <div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div>
+        </a>
+        <a class="card" href="https://api-bridge-lab-void.invalid/" target="_blank" rel="noopener noreferrer">
+          <div class="tag offline">已跑路 / Offline</div>
+          <h4 class="name">API桥接实验室 / API Bridge Lab</h4>
+          <p class="desc lang-content active" data-lang-content="zh">服务 8 天，域名无法解析，疑似停止维护。</p>
+          <p class="desc lang-content" data-lang-content="en">Active for 8 days, then the domain became unresolvable.</p>
+          <div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div>
+        </a>
+        <a class="card" href="https://ai-fast-node-ghost.invalid/" target="_blank" rel="noopener noreferrer">
+          <div class="tag closed">已下线 / Closed</div>
+          <h4 class="name">AI极速节点 / AI Fast Node</h4>
+          <p class="desc lang-content active" data-lang-content="zh">服务 54 天，套餐入口消失，访问结果异常。</p>
+          <p class="desc lang-content" data-lang-content="en">Stayed live for 54 days before the entry page disappeared.</p>
+          <div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div>
+        </a>
+        <a class="card" href="https://chat-relay-hub-dead.invalid/" target="_blank" rel="noopener noreferrer">
+          <div class="tag offline">已跑路 / Offline</div>
+          <h4 class="name">Chat中转枢纽 / Chat Relay Hub</h4>
+          <p class="desc lang-content active" data-lang-content="zh">服务 21 天，公告长期未更新，控制台无法进入。</p>
+          <p class="desc lang-content" data-lang-content="en">Live for 21 days, then announcements stopped and the console became unavailable.</p>
+          <div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div>
+        </a>
+        <a class="card" href="https://model-proxy-house-lost.invalid/" target="_blank" rel="noopener noreferrer">
+          <div class="tag closed">已下线 / Closed</div>
+          <h4 class="name">模型代理屋 / Model Proxy House</h4>
+          <p class="desc lang-content active" data-lang-content="zh">服务 46 天，节点列表清空，服务状态不可用。</p>
+          <p class="desc lang-content" data-lang-content="en">Ran for 46 days before the node list was cleared.</p>
+          <div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div>
+        </a>
+        <a class="card" href="https://ai-key-station-404.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI密钥中转站 / AI Key Station</h4><p class="desc lang-content active" data-lang-content="zh">服务 17 天，登录页打不开，支付页无响应。</p><p class="desc lang-content" data-lang-content="en">Lasted 17 days before the login and payment pages failed.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://smart-api-route-null.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">智算API路由 / Smart API Route</h4><p class="desc lang-content active" data-lang-content="zh">服务 59 天，解析失败，未发现可用服务入口。</p><p class="desc lang-content" data-lang-content="en">Stayed online for 59 days before the route became unavailable.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://openai-relay-yard-gone.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">OpenAI中转场 / OpenAI Relay Yard</h4><p class="desc lang-content active" data-lang-content="zh">服务 25 天，曾提供共享通道，后站点关闭。</p><p class="desc lang-content" data-lang-content="en">Ran for 25 days before the site shut down.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://llm-gateway-park-dead.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">LLM网关园区 / LLM Gateway Park</h4><p class="desc lang-content active" data-lang-content="zh">服务 41 天，控制台和文档站均无法访问。</p><p class="desc lang-content" data-lang-content="en">Ran for 41 days before the console and docs disappeared.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-tunnel-shop-missing.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI隧道小铺 / AI Tunnel Shop</h4><p class="desc lang-content active" data-lang-content="zh">服务 6 天，付款入口失效，公告无后续说明。</p><p class="desc lang-content" data-lang-content="en">Live for 6 days before the checkout entry failed.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://neural-relay-market-404.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">神经中转市场 / Neural Relay Market</h4><p class="desc lang-content active" data-lang-content="zh">服务 33 天，网站证书异常，服务不可验证。</p><p class="desc lang-content" data-lang-content="en">Ran for 33 days, then the certificate and site verification failed.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://gpt-port-supply-void.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">GPT接口补给站 / GPT API Supply</h4><p class="desc lang-content active" data-lang-content="zh">服务 49 天，接口返回失败，后台页面消失。</p><p class="desc lang-content" data-lang-content="en">Stayed up for 49 days before the backend vanished.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-route-bay-dead.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">AI路由湾 / AI Route Bay</h4><p class="desc lang-content active" data-lang-content="zh">服务 14 天，主域名关闭，备用域名未公布。</p><p class="desc lang-content" data-lang-content="en">Stayed live for 14 days before the main domain was closed.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://token-bridge-ai-lost.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">Token桥AI站 / Token Bridge AI</h4><p class="desc lang-content active" data-lang-content="zh">服务 58 天，余额查询入口失效，服务中断。</p><p class="desc lang-content" data-lang-content="en">Ran for 58 days before the balance check entry failed.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://aigc-proxy-center-null.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">AIGC代理中心 / AIGC Proxy Center</h4><p class="desc lang-content active" data-lang-content="zh">服务 27 天，页面长期维护，未恢复访问。</p><p class="desc lang-content" data-lang-content="en">Ran for 27 days before the page went into maintenance.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-call-transfer-off.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI调用转运站 / AI Call Transfer</h4><p class="desc lang-content active" data-lang-content="zh">服务 52 天，请求超时严重，随后站点无法打开。</p><p class="desc lang-content" data-lang-content="en">Live for 52 days before timeouts took it down.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://chatgpt-line-house-404.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">ChatGPT线路屋 / ChatGPT Line House</h4><p class="desc lang-content active" data-lang-content="zh">服务 19 天，线路面板不可用，服务疑似关闭。</p><p class="desc lang-content" data-lang-content="en">Stayed up for 19 days before the route panel became unavailable.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://relay-plus-ai-gone.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">Relay Plus AI</h4><p class="desc lang-content active" data-lang-content="zh">服务 44 天，购买记录无法查询，站点停止响应。</p><p class="desc lang-content" data-lang-content="en">Ran for 44 days before payment records and the site vanished.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://gpt-channel-store-dead.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">GPT通道商店 / GPT Channel Store</h4><p class="desc lang-content active" data-lang-content="zh">服务 31 天，商品列表清空，域名访问失败。</p><p class="desc lang-content" data-lang-content="en">Stayed live for 31 days before the product list disappeared.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-port-forward-lost.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI端口转发站 / AI Port Forward</h4><p class="desc lang-content active" data-lang-content="zh">服务 9 天，服务公告删除，通道不可用。</p><p class="desc lang-content" data-lang-content="en">Live for 9 days before the service notice and route failed.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://model-route-cloud-null.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">模型路由云 / Model Route Cloud</h4><p class="desc lang-content active" data-lang-content="zh">服务 56 天，主站 404，接口文档也已失效。</p><p class="desc lang-content" data-lang-content="en">Ran for 56 days before the main site and docs went offline.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-transfer-cabin-404.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI中转舱 / AI Transfer Cabin</h4><p class="desc lang-content active" data-lang-content="zh">服务 23 天，域名停放，未见有效客服渠道。</p><p class="desc lang-content" data-lang-content="en">Ran for 23 days before the domain was parked.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://gpt-bridge-mall-void.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">GPT桥接商城 / GPT Bridge Mall</h4><p class="desc lang-content active" data-lang-content="zh">服务 60 天，付款页无法打开，通道不可验证。</p><p class="desc lang-content" data-lang-content="en">Stayed live for 60 days before the payment page failed.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-service-relay-gone.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI服务转接站 / AI Service Relay</h4><p class="desc lang-content active" data-lang-content="zh">服务 16 天，服务面板消失，疑似停止运营。</p><p class="desc lang-content" data-lang-content="en">Live for 16 days before the service panel disappeared.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://llm-api-wharf-dead.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">LLM接口码头 / LLM API Wharf</h4><p class="desc lang-content active" data-lang-content="zh">服务 35 天，站点无响应，历史链接不可用。</p><p class="desc lang-content" data-lang-content="en">Ran for 35 days before the site became unresponsive.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-token-route-missing.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI令牌路由站 / AI Token Route</h4><p class="desc lang-content active" data-lang-content="zh">服务 5 天，登录跳转失败，用户中心关闭。</p><p class="desc lang-content" data-lang-content="en">Live for 5 days before login and routing failed.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://gpt-node-harbor-null.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">GPT节点港 / GPT Node Harbor</h4><p class="desc lang-content active" data-lang-content="zh">服务 48 天，节点状态全量异常，站点下线。</p><p class="desc lang-content" data-lang-content="en">Ran for 48 days before all nodes became unavailable.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://ai-proxy-workshop-404.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag offline">已跑路 / Offline</div><h4 class="name">AI代理工坊 / AI Proxy Workshop</h4><p class="desc lang-content active" data-lang-content="zh">服务 29 天，工单系统关闭，API 域名失效。</p><p class="desc lang-content" data-lang-content="en">Live for 29 days before support and API access failed.</p><div class="meta"><span class="status offline">已跑路</span><span class="visit">查看链接</span></div></a>
+        <a class="card" href="https://chat-model-transfer-dead.invalid/" target="_blank" rel="noopener noreferrer"><div class="tag closed">已下线 / Closed</div><h4 class="name">Chat模型中转站 / Chat Model Relay</h4><p class="desc lang-content active" data-lang-content="zh">服务 42 天，入口无法访问，服务确认不可用。</p><p class="desc lang-content" data-lang-content="en">Stayed up for 42 days before the entry went offline.</p><div class="meta"><span class="status closed">已下线</span><span class="visit">查看链接</span></div></a>
+      </div>
+    </section>
+
+    <div class="footer">Free2AI · https://free2ai.pages.dev/</div>
+  </main>
+
+  <script>
+    (function () {
+      var select = document.getElementById('languageSelect');
+      var zhBlocks = Array.prototype.slice.call(document.querySelectorAll('[data-lang-content="zh"]'));
+      var enBlocks = Array.prototype.slice.call(document.querySelectorAll('[data-lang-content="en"]'));
+
+      function setLanguage(lang) {
+        var useZh = lang === 'zh';
+        zhBlocks.forEach(function (node) { node.classList.toggle('active', useZh); });
+        enBlocks.forEach(function (node) { node.classList.toggle('active', !useZh); });
+        select.value = useZh ? 'zh' : 'en';
+        document.documentElement.lang = useZh ? 'zh-CN' : 'en';
+      }
+
+      select.addEventListener('change', function () {
+        setLanguage(select.value);
+      });
+
+      var locale = (navigator.language || navigator.userLanguage || '').toLowerCase();
+      setLanguage(locale.indexOf('zh') === 0 || locale.indexOf('cn') !== -1 || locale.indexOf('tw') !== -1 || locale.indexOf('hk') !== -1 ? 'zh' : 'en');
+    })();
+  </script>
+</body>
+</html>
